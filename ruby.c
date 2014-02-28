@@ -28,7 +28,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_DESCRIBE, K_CONTEXT
+	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_DESCRIBE, K_CONTEXT, K_FILTER, K_ROUTE
 } rubyKind;
 
 /*
@@ -40,7 +40,9 @@ static kindOption RubyKinds [] = {
 	{ TRUE, 'm', "module", "modules" },
 	{ TRUE, 'F', "singleton method", "singleton methods" },
 	{ TRUE, 'd', "describe", "describes" },
-	{ TRUE, 'C', "context", "contexts" }
+	{ TRUE, 'C', "context", "contexts" },
+    { TRUE, 'b', "filter", "filters"},
+    { TRUE, 'p', "route", "routes" }
 };
 
 static stringList* nesting = 0;
@@ -187,7 +189,7 @@ static rubyKind parseIdentifier (
 	{
 		also_ok = "_.?!=";
 	}
-	else if (kind == K_DESCRIBE || kind == K_CONTEXT)
+	else if (kind == K_DESCRIBE || kind == K_CONTEXT || kind == K_FILTER || kind == K_ROUTE)
 	{
 		also_ok = " ,\".#_?!='/-";
 	}
@@ -361,6 +363,18 @@ static void findRubyTags (void)
 		{
 			readAndEmitTag (&cp, K_DESCRIBE);
 		}
+        else if (canMatch (&cp, "before"))
+        {
+            readAndEmitTag (&cp, K_FILTER);
+        }
+        else if (canMatch (&cp, "get"))
+        {
+            readAndEmitTag (&cp, K_ROUTE);
+        }
+        else if (canMatch (&cp, "post"))
+        {
+            readAndEmitTag (&cp, K_ROUTE);
+        }
 		else if (canMatch (&cp, "context"))
 		{
 			readAndEmitTag (&cp, K_CONTEXT);
